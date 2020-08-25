@@ -63,7 +63,7 @@ const useStyles = makeStyles({
     bottom: 0,
     left: 0,
     width: "100%",
-    maxHeight: "35vh",
+    maxHeight: "66vh",
     background: "#22211F",
     color: "#757575",
   },

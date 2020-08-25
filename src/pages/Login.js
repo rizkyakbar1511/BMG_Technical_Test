@@ -18,6 +18,7 @@ import { useQuery } from "react-query";
 import Visibility from "@material-ui/icons/Visibility";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import Email from "@material-ui/icons/Email";
+import axios from "axios";
 
 export default function Login() {
   const [values, setValues] = useState({
@@ -25,11 +26,36 @@ export default function Login() {
     password: "",
     showPassword: false,
   });
-  const { isLoading, error, data } = useQuery("auth", () =>
-    fetch(
+  const { isLoading, error, data } = useQuery("auth", async () => {
+    const {
+      data: { request_token },
+    } = await axios.get(
       `https://api.themoviedb.org/3/authentication/token/new?api_key=${API_KEYS_V3}`
-    ).then((res) => res.json())
-  );
+    );
+    const {
+      data: { request_token: login_token },
+    } = await axios({
+      method: "POST",
+      url: `https://api.themoviedb.org/3/authentication/token/validate_with_login?api_key=${API_KEYS_V3}`,
+      data: {
+        username: "rizkyakbar1511",
+        password: "h3xac0re",
+        request_token: request_token,
+      },
+    });
+
+    const {
+      data: { session_id },
+    } = await axios({
+      method: "POST",
+      url: `https://api.themoviedb.org/3/authentication/session/new?api_key=${API_KEYS_V3}`,
+      data: {
+        request_token: login_token,
+      },
+    });
+
+    return session_id;
+  });
 
   const classes = useStyles();
   const handleChange = (prop) => (event) => {
@@ -43,6 +69,12 @@ export default function Login() {
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    localStorage.setItem("session", data);
+  };
+
   if (isLoading)
     return (
       <Box className={classes.loadingContainer} component="div">
@@ -113,10 +145,7 @@ export default function Login() {
             <Button
               className={classes.btnLogin}
               type="submit"
-              onClick={(e) => {
-                localStorage.setItem("token", data.request_token);
-                e.preventDefault();
-              }}
+              onClick={handleSubmit}
             >
               Login
             </Button>

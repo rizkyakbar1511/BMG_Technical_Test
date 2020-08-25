@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import {
   Container,
@@ -13,17 +13,8 @@ import DesktopMenu from "./Menu/DesktopMenu";
 import MobileMenu from "./Menu/MobileMenu";
 
 export default function Navigation() {
-  const [anchorEl, setAnchorEl] = useState(null);
   const pageSize = useWindowWidth();
   const classes = useStyles();
-
-  const handleClick = (e) => {
-    setAnchorEl(e.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
 
   return (
     <AppBar className={classes.root} position="static">
@@ -37,14 +28,7 @@ export default function Navigation() {
                 </Link>
               </Typography>
             </Grid>
-            {pageSize > 1000 && (
-              <DesktopMenu
-                handleClick={handleClick}
-                handleClose={handleClose}
-                anchorEl={anchorEl}
-                classes={classes}
-              />
-            )}
+            {pageSize > 1000 && <DesktopMenu classes={classes} />}
             {pageSize < 1000 && <MobileMenu />}
           </Grid>
         </Toolbar>
@@ -125,5 +109,14 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.up("md")]: {
       width: "20ch",
     },
+  },
+  paper: {
+    borderRadius: 6,
+    padding: theme.spacing(1),
+    backgroundColor: theme.palette.background.paper,
+  },
+  paperLink: {
+    textDecoration: "none",
+    color: "#22211F",
   },
 }));

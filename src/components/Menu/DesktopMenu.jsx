@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect } from "react";
+import React, { Fragment, useEffect } from "react";
 import {
   Grid,
   Box,
@@ -15,27 +15,36 @@ import {
 } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import { Add } from "@material-ui/icons";
-import SearchIcon from "@material-ui/icons/Search";
 import { useQuery } from "react-query";
-import { API_KEYS_V3 } from "../../keys";
+import { useStoreState, useStoreActions } from "easy-peasy";
+import { MoviesPopper, TvPopper } from "../Popper";
+import { fetchSearch } from "../../utils/utils";
+import SearchIcon from "@material-ui/icons/Search";
 
-export default function DesktopMenu({
-  classes,
-  handleClick,
-  handleClose,
-  anchorEl,
-}) {
-  const [search, setSearch] = useState("");
-  const { isLoading, error, data, refetch } = useQuery("searchFilm", () =>
-    fetch(
-      `https://api.themoviedb.org/3/search/movie?api_key=${API_KEYS_V3}&language=en-US&query=${search}&page=1&include_adult=false`
-    ).then((res) => res.json())
+export default function DesktopMenu({ classes }) {
+  const { triggerMovie, triggerTv, setSearch, setPopover } = useStoreActions(
+    (actions) => ({
+      triggerMovie: actions.popper.triggerMovie,
+      triggerTv: actions.popper.triggerTv,
+      setSearch: actions.search.setSearch,
+      setPopover: actions.popover.setPopover,
+    })
   );
-  const open = Boolean(anchorEl);
-  const id = open ? "simple-popover" : undefined;
-  const searchEvent = (e) => {
-    setSearch(e.target.value);
-  };
+  const { moviePopperEl, tvPopperEl, popoverEl, search } = useStoreState(
+    (state) => ({
+      moviePopperEl: state.popper.movie,
+      tvPopperEl: state.popper.tv,
+      search: state.search.search,
+      popoverEl: state.popover.popover,
+    })
+  );
+
+  const { isLoading, error, data, refetch } = useQuery(["searchFilm"], () =>
+    fetchSearch(search)
+  );
+  const openPopover = Boolean(popoverEl);
+  const idPopover = openPopover ? "desktop-menu-popover" : undefined;
+
   useEffect(() => {
     refetch();
   }, [search, refetch]);
@@ -46,13 +55,23 @@ export default function DesktopMenu({
     <Fragment>
       <Grid item xs={4} md={8} className={classes.navMidItem}>
         <Box component="div" className={classes.navItemWrapper}>
-          <Link className={classes.navLink} to="/movies">
+          <Link
+            className={classes.navLink}
+            to="/"
+            onMouseOver={(e) =>
+              triggerMovie(moviePopperEl ? null : e.currentTarget)
+            }
+          >
             Movies
           </Link>
-          <Link className={classes.navLink} to="/tv">
+          <Link
+            className={classes.navLink}
+            to="/"
+            onMouseOver={(e) => triggerTv(tvPopperEl ? null : e.currentTarget)}
+          >
             TV Shows
           </Link>
-          <Link className={classes.navLink} to="/people">
+          <Link className={classes.navLink} to="/person">
             People
           </Link>
           <div className={classes.search}>
@@ -66,7 +85,7 @@ export default function DesktopMenu({
                 input: classes.inputInput,
               }}
               inputProps={{ "aria-label": "search" }}
-              onChange={searchEvent}
+              onChange={(e) => setSearch(e.target.value)}
             />
           </div>
           {data && (
@@ -74,23 +93,36 @@ export default function DesktopMenu({
               {isLoading && <LinearProgress />}
               {data.results && search !== "" ? (
                 <div className={classes.searchResult}>
-                  {data.results.map((item) => (
-                    <ListItem
-                      button
-                      style={{ display: "flex", color: "#393534" }}
-                      key={item.id}
-                    >
-                      <ListItemAvatar>
-                        <Avatar
-                          alt={item.title}
-                          src={`https://image.tmdb.org/t/p/w185/${item.poster_path}`}
+                  {data.results.map(
+                    ({
+                      id,
+                      title,
+                      poster_path,
+                      profile_path,
+                      original_name,
+                      name,
+                    }) => (
+                      <ListItem
+                        button
+                        style={{ display: "flex", color: "#393534" }}
+                        key={id}
+                      >
+                        <ListItemAvatar>
+                          <Avatar
+                            alt={title}
+                            src={
+                              !name
+                                ? `https://image.tmdb.org/t/p/w185/${poster_path}`
+                                : `https://image.tmdb.org/t/p/w185/${profile_path}`
+                            }
+                          />
+                        </ListItemAvatar>
+                        <ListItemText
+                          primary={title || original_name || name}
                         />
-                      </ListItemAvatar>
-                      <ListItemText
-                        primary={item.title || item.original_name}
-                      />
-                    </ListItem>
-                  ))}
+                      </ListItem>
+                    )
+                  )}
                 </div>
               ) : null}
             </Fragment>
@@ -100,16 +132,16 @@ export default function DesktopMenu({
       <Grid item xs={4} md={2} className={classes.navRightItem}>
         <Button
           className={classes.navLink}
-          aria-describedby={id}
-          onClick={handleClick}
+          aria-describedby={idPopover}
+          onClick={(e) => setPopover(e.currentTarget)}
         >
           <Add />
         </Button>
         <Popover
-          id={id}
-          open={open}
-          anchorEl={anchorEl}
-          onClose={handleClose}
+          id={idPopover}
+          open={openPopover}
+          anchorEl={popoverEl}
+          onClose={() => setPopover(null)}
           anchorOrigin={{
             vertical: "bottom",
             horizontal: "center",
@@ -123,6 +155,8 @@ export default function DesktopMenu({
             Can't find a movie or TV show? Login to create it.
           </Typography>
         </Popover>
+        <MoviesPopper popperEl={moviePopperEl} classes={classes} />
+        <TvPopper popperEl={tvPopperEl} classes={classes} />
         <Link className={classes.navLink} to="/login">
           Login
         </Link>

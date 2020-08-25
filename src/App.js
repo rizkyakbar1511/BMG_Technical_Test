@@ -3,8 +3,14 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Navigation from "./components/Navigation";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import Movies from "./pages/Movies";
-import Tv from "./pages/Tv";
+import Popular from "./pages/Movies/Popular";
+import NowPlaying from "./pages/Movies/NowPlaying";
+import Upcoming from "./pages/Movies/Upcoming";
+import TopRated from "./pages/Movies/TopRated";
+import PopularTv from "./pages/Tv/Popular";
+import Airing from "./pages/Tv/Airing";
+import TopRatedTv from "./pages/Tv/TopRated";
+import OnTv from "./pages/Tv/OnTv";
 import People from "./pages/People";
 import Footer from "./components/Footer";
 import "./App.css";
@@ -20,9 +26,15 @@ function App() {
         <Switch>
           <Route exact path="/" component={Home} />
           <Route path="/login" component={Login} />
-          <Route path="/movies" component={Movies} />
-          <Route path="/tv" component={Tv} />
-          <Route path="/people" component={People} />
+          <Route exact path="/movie" component={Popular} />
+          <Route path="/movie/now-playing" component={NowPlaying} />
+          <Route path="/movie/upcoming" component={Upcoming} />
+          <Route path="/movie/top-rated" component={TopRated} />
+          <Route exact path="/tv" component={PopularTv} />
+          <Route path="/tv/airing-today" component={Airing} />
+          <Route path="/tv/on-the-air" component={OnTv} />
+          <Route path="/tv/top-rated" component={TopRatedTv} />
+          <Route path="/person" component={People} />
         </Switch>
         <Footer />
       </Router>

@@ -13,7 +13,6 @@ import {
 } from "@material-ui/core";
 import Pagination from "@material-ui/lab/Pagination";
 import { makeStyles } from "@material-ui/core/styles";
-import { Star } from "@material-ui/icons";
 import { useQuery } from "react-query";
 import { API_KEYS_V3 } from "../keys";
 import ModalPeople from "../components/Modal/ModalPeople";
@@ -35,7 +34,7 @@ export default function People() {
   };
 
   useEffect(() => {
-    if (pages) refetch();
+    refetch();
   }, [pages, refetch]);
 
   const handleOpen = (id) => {
@@ -80,10 +79,6 @@ export default function People() {
                         <Typography variant="subtitle2" noWrap={true}>
                           {item.name}
                         </Typography>
-                        <Typography>
-                          <Star style={{ color: "#FF7314" }} />{" "}
-                          {item.popularity}
-                        </Typography>
                         <Typography
                           variant="body2"
                           color="textSecondary"
@@ -126,9 +121,9 @@ const useStyles = makeStyles({
   },
   card: {
     maxWidth: 200,
-    maxHeight: 320,
+    maxHeight: 300,
     minWidth: 200,
-    minHeight: 330,
+    minHeight: 300,
     "&:hover": {
       webkitBoxShadow: "0px 3px 5px 0px rgba(255,115,20,1)",
       mozBoxShadow: "0px 3px 5px 0px rgba(255,115,20,1)",
