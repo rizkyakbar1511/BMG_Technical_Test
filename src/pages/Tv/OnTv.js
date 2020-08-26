@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   Box,
   Grid,
@@ -74,18 +74,24 @@ export default function OnTv() {
           </Box>
           <Grid container spacing={4} style={{ marginTop: "10px" }}>
             {data.results.map(
-              ({ id, poster_path, title, vote_average, first_air_date }) => (
+              ({
+                id,
+                poster_path,
+                original_name,
+                vote_average,
+                first_air_date,
+              }) => (
                 <Grid item sm="auto" md="auto" key={id}>
                   <Card className={classes.card}>
                     <CardActionArea onClick={() => handleOpen(id)}>
                       <CardMedia
                         className={classes.media}
                         image={`https://image.tmdb.org/t/p/w185/${poster_path}`}
-                        title={title}
+                        title={original_name}
                       />
                       <CardContent>
                         <Typography variant="subtitle2" noWrap={true}>
-                          {title}
+                          {original_name}
                         </Typography>
                         <Typography>
                           <Star style={{ color: "#FF7314" }} /> {vote_average}

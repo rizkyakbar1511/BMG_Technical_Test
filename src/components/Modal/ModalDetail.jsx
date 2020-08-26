@@ -3,6 +3,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import {
   Box,
   Grid,
+  Button,
   Typography,
   LinearProgress,
   CircularProgress,
@@ -65,17 +66,25 @@ export default function ModalDetail({ handleClose, open, movieId }) {
                 </Grid>
                 <Grid item md={8}>
                   <h2 id="simple-modal-title">{data.original_title}</h2>
-                  <Box display="flex" component="div" width="350px">
-                    <Typography>
-                      <Star style={{ color: "#FF7314" }} /> {data.vote_average}
-                    </Typography>
+                  <Box
+                    display="flex"
+                    component="div"
+                    width="400px"
+                    flexDirection="column"
+                  >
+                    <Box display="flex" component="div" alignItems="center">
+                      <Star style={{ color: "#FF7314" }} />
+                      <Typography>{data.vote_average}</Typography>
+                    </Box>
                     <Box
                       display="flex"
                       component="div"
-                      justifyContent="space-between"
-                      width="80%"
+                      justifyContent="flex-start"
+                      width="150%"
+                      flexWrap="wrap"
                       alignItems="center"
-                      marginLeft="10px"
+                      marginBottom="14px"
+                      marginTop="14px"
                     >
                       {videos && videos.results ? (
                         <>
@@ -95,13 +104,27 @@ export default function ModalDetail({ handleClose, open, movieId }) {
                     </Box>
                   </Box>
                   <Typography variant="caption">
+                    Genre:{" "}
                     {data.genres && data.genres[0] ? data.genres[0].name : null}
                   </Typography>
-                  <p id="simple-modal-description">
-                    {data.overview !== ""
-                      ? data.overview
-                      : "We don't have an overview translated in English. Help us expand our database by adding one."}
-                  </p>
+                  <Typography className={classes.typographTitle}>
+                    Overview
+                  </Typography>
+                  <>
+                    {data.overview && (
+                      <Typography
+                        className={classes.typographBody}
+                        noWrap={data.overview.length > 800 ? true : false}
+                      >
+                        {data.overview !== ""
+                          ? data.overview
+                          : "We don't have an overview translated in English. Help us expand our database by adding one."}
+                      </Typography>
+                    )}
+                  </>
+                  <Button variant="contained" style={{ marginTop: 14 }}>
+                    More
+                  </Button>
                 </Grid>
               </Grid>
             </div>
@@ -139,11 +162,22 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "#FF7314",
     color: "#393534",
     borderRadius: "10px",
+    marginRight: 10,
+    marginBottom: 5,
   },
   loadingContainer: {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     height: "100%",
+  },
+  typographTitle: {
+    fontWeight: 600,
+    fontSize: "1.3em",
+    marginBottom: 8,
+    marginTop: 8,
+  },
+  typographBody: {
+    textAlign: "justify",
   },
 }));

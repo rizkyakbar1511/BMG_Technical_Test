@@ -3,6 +3,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import {
   Box,
   Grid,
+  Button,
   Typography,
   LinearProgress,
   CircularProgress,
@@ -118,6 +119,9 @@ export default function ModalDetailTv({ handleClose, open, tvId }) {
                       </Typography>
                     )}
                   </>
+                  <Button variant="contained" style={{ marginTop: 14 }}>
+                    More
+                  </Button>
                 </Grid>
               </Grid>
             </div>

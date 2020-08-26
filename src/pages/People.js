@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   Box,
   Grid,
@@ -14,48 +14,58 @@ import {
 import Pagination from "@material-ui/lab/Pagination";
 import { makeStyles } from "@material-ui/core/styles";
 import { useQuery } from "react-query";
-import { API_KEYS_V3 } from "../keys";
+import { useStoreState, useStoreActions } from "easy-peasy";
+import Snackbar from "@material-ui/core/Snackbar";
 import ModalPeople from "../components/Modal/ModalPeople";
+import Alert from "../components/Alert";
+import { fetchPeople } from "../utils/utils";
 
 export default function People() {
-  const [pages, setPages] = useState(1);
-  const [open, setOpen] = useState(false);
-  const [personId, setPersonId] = useState("");
   const classes = useStyles();
-  const { isFetching, isLoading, error, data, refetch } = useQuery(
-    "getMovies",
-    () =>
-      fetch(
-        `https://api.themoviedb.org/3/person/popular?api_key=${API_KEYS_V3}&language=en-US&page=${pages}`
-      ).then((res) => res.json())
+  const { setPersonId, setPages, setOpen, setTrigger } = useStoreActions(
+    (actions) => ({
+      setPersonId: actions.person.setPersonId,
+      setPages: actions.movie.setPages,
+      setOpen: actions.movie.setOpen,
+      setTrigger: actions.toast.setTrigger,
+    })
   );
-  const paginate = (e) => {
-    setPages(e.target.textContent);
-  };
 
-  useEffect(() => {
-    refetch();
-  }, [pages, refetch]);
+  const { personId, pages, open, trigger } = useStoreState((state) => ({
+    personId: state.person.personId,
+    pages: state.movie.pages,
+    filterBy: state.movie.filterBy,
+    open: state.movie.open,
+    trigger: state.toast.trigger,
+  }));
+  const { isFetching, status, error, data, refetch } = useQuery(
+    "getMovies",
+    () => fetchPeople(pages)
+  );
 
   const handleOpen = (id) => {
     setPersonId(id);
     setOpen(true);
   };
 
-  const handleClose = () => {
-    setOpen(false);
-  };
+  useEffect(() => {
+    if (status === "error") setTrigger(true);
+    refetch();
+    return () => {
+      refetch();
+    };
+  }, [pages, refetch, status, setTrigger]);
 
   return (
     <div className={classes.root}>
-      {isLoading && <LinearProgress />}
+      {status === "loading" && <LinearProgress />}
       {data && (
         <Container>
           <Box display="flex" component="div" flexWrap="wrap">
             <Typography variant="h4">Popular People</Typography>
             <ModalPeople
               handleOpen={handleOpen}
-              handleClose={handleClose}
+              handleClose={() => setOpen(false)}
               open={open}
               personId={personId}
             />
@@ -103,12 +113,22 @@ export default function People() {
             <Pagination
               count={data.total_pages}
               shape="rounded"
-              onClick={paginate}
+              onClick={(e) => setPages(e.target.textContent)}
             />
           </Box>
         </Container>
       )}
-      {error && <p>{error.message}</p>}
+      {status === "error" && (
+        <Snackbar
+          open={trigger}
+          autoHideDuration={6000}
+          onClose={() => setTrigger(false)}
+        >
+          <Alert onClose={() => setTrigger(false)} severity="error">
+            {error.message}
+          </Alert>
+        </Snackbar>
+      )}
     </div>
   );
 }

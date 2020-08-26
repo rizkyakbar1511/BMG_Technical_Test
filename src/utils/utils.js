@@ -57,6 +57,13 @@ export const fetchMovieVideos = async (movieId) => {
   return res.json();
 };
 
+export const fetchPeople = async (pages) => {
+  const res = await fetch(
+    `https://api.themoviedb.org/3/person/popular?api_key=${API_KEYS_V3}&language=en-US&page=${pages}`
+  );
+  return res.json();
+};
+
 export const fetchDetailPeople = async (personId) => {
   const res = await fetch(
     `https://api.themoviedb.org/3/person/${personId}?api_key=${API_KEYS_V3}&language=en-US`

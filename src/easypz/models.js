@@ -40,6 +40,13 @@ const popoverModel = {
   }),
 };
 
+const personModel = {
+  personId: "",
+  setPersonId: action((state, payload) => {
+    state.personId = payload;
+  }),
+};
+
 const movieModel = {
   movieId: "",
   tvId: "",
@@ -75,6 +82,7 @@ export const storeModel = {
   popover: popoverModel,
   search: searchModel,
   movie: movieModel,
+  person: personModel,
   toast: toastModel,
   modal: modalStyles,
 };
