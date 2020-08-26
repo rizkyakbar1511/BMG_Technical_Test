@@ -2,7 +2,7 @@
 
 explore your favorite movies
 
-#### Front-End - React.js + React-Query + Material-UI
+#### Front-End - React.js + React-Query + Material-UI + easy-peasy (simple local state management)
 
 #### Powered By - TMDb API
 
